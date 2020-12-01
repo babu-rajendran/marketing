@@ -9,6 +9,7 @@ import com.digital.marketing.repository.CampaignRepository;
 import com.digital.marketing.repository.SegmentRepository;
 import com.digital.marketing.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -47,7 +48,7 @@ public class AdminController {
     @Autowired
     private SegmentRepository segmentRepository;
 
-    @RequestMapping(value= {"/", "/login"}, method= RequestMethod.GET)
+    @RequestMapping(value = {"/", "/login"}, method = RequestMethod.GET)
     public ModelAndView login() {
         ModelAndView model = new ModelAndView();
 
@@ -55,7 +56,7 @@ public class AdminController {
         return model;
     }
 
-    @RequestMapping(value= {"/signup"}, method=RequestMethod.GET)
+    @RequestMapping(value = {"/signup"}, method = RequestMethod.GET)
     public ModelAndView signup() {
         ModelAndView model = new ModelAndView();
         User user = new User();
@@ -65,15 +66,15 @@ public class AdminController {
         return model;
     }
 
-    @RequestMapping(value= {"/signup"}, method=RequestMethod.POST)
+    @RequestMapping(value = {"/signup"}, method = RequestMethod.POST)
     public ModelAndView createUser(@Valid User user, BindingResult bindingResult) {
         ModelAndView model = new ModelAndView();
         User userExists = adminService.findUserByEmail(user.getEmail());
 
-        if(userExists != null) {
+        if (userExists != null) {
             bindingResult.rejectValue("email", "error.user", "This email already exists!");
         }
-        if(bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             model.setViewName("user/signup");
         } else {
             adminService.saveUser(user);
@@ -85,7 +86,7 @@ public class AdminController {
         return model;
     }
 
-    @RequestMapping(value= {"/home/home"}, method=RequestMethod.GET)
+    @RequestMapping(value = {"/home/home"}, method = RequestMethod.GET)
     public ModelAndView home() {
         ModelAndView model = new ModelAndView();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -96,7 +97,7 @@ public class AdminController {
         return model;
     }
 
-    @RequestMapping(value= {"/home/users"}, method=RequestMethod.GET)
+    @RequestMapping(value = {"/home/users"}, method = RequestMethod.GET)
     public ModelAndView users() {
         ModelAndView model = new ModelAndView();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -109,7 +110,7 @@ public class AdminController {
         return model;
     }
 
-    @RequestMapping(value= {"/home/campaigns"}, method=RequestMethod.GET)
+    @RequestMapping(value = {"/home/campaigns"}, method = RequestMethod.GET)
     public ModelAndView campaigns() {
         ModelAndView model = new ModelAndView();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -119,14 +120,14 @@ public class AdminController {
         return model;
     }
 
-    @RequestMapping(value= {"/campaigns/run-campaigns"}, method=RequestMethod.POST)
+    @RequestMapping(value = {"/campaigns/run-campaigns"}, method = RequestMethod.POST)
     public ModelAndView runCampaigns(HttpServletRequest httpServletRequest, @Valid Run run, BindingResult bindingResult) throws Exception {
         String campaignId = httpServletRequest.getParameter("campaign");
         String segmentId = httpServletRequest.getParameter("segment");
 
         var values = new HashMap<String, String>() {{
             put("campaign_id", campaignId);
-            put ("segment_id", segmentId);
+            put("segment_id", segmentId);
         }};
 
         var objectMapper = new ObjectMapper();
@@ -160,7 +161,7 @@ public class AdminController {
         return model;
     }
 
-    @RequestMapping(value= {"/home/run-campaigns"}, method=RequestMethod.GET)
+    @RequestMapping(value = {"/home/run-campaigns"}, method = RequestMethod.GET)
     public ModelAndView selectCampaigns() {
         ModelAndView model = new ModelAndView();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -181,17 +182,17 @@ public class AdminController {
         return model;
     }
 
-    @RequestMapping(value= {"/campaigns"}, method=RequestMethod.POST)
+    @RequestMapping(value = {"/campaigns"}, method = RequestMethod.POST)
     public String createCampaign(@Valid Campaign campaign, BindingResult bindingResult) {
         List<Campaign> campaigns = campaignRepository.getAllCampaigns();
         Campaign c = campaigns.stream().max(Comparator.comparing(Campaign::getId))
                 .orElseThrow(NoSuchElementException::new);
-        campaign.setId(c.getId()+ 1);
+        campaign.setId(c.getId() + 1);
         campaignRepository.save(campaign);
         return "redirect:/campaigns";
     }
 
-    @RequestMapping(value= {"/campaigns"}, method=RequestMethod.GET)
+    @RequestMapping(value = {"/campaigns"}, method = RequestMethod.GET)
     public ModelAndView listAllCampaigns() {
         ModelAndView model = new ModelAndView();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -207,7 +208,7 @@ public class AdminController {
         return model;
     }
 
-    @RequestMapping(value= {"/campaigns/create"}, method=RequestMethod.GET)
+    @RequestMapping(value = {"/campaigns/create"}, method = RequestMethod.GET)
     public ModelAndView createCampaign() {
         ModelAndView model = new ModelAndView();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -218,7 +219,7 @@ public class AdminController {
         return model;
     }
 
-    @RequestMapping(value= {"/segments"}, method=RequestMethod.GET)
+    @RequestMapping(value = {"/segments"}, method = RequestMethod.GET)
     public ModelAndView listAllSegments() {
         ModelAndView model = new ModelAndView();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -239,19 +240,26 @@ public class AdminController {
         List<com.digital.marketing.entity.User> filteredUsers = null;
         if (Integer.valueOf(id) == 1) {
             filteredUsers = users.stream().filter(user -> Integer.valueOf(user.getAge()) > 18).collect(Collectors.toList());
+        } else if (Integer.valueOf(id) == 2) {
+            filteredUsers = users.stream().filter(user -> user.getGender().equals("Female")).collect(Collectors.toList());
+        } else if (Integer.valueOf(id) == 3) {
+            filteredUsers = users.stream().filter(user -> StringUtils.substringBetween(user.getDob(), "/", "/").equals("12")).collect(Collectors.toList());
+        } else if (Integer.valueOf(id) == 4) {
+            filteredUsers = users.stream().filter(user -> StringUtils.substringBetween(user.getDob(), "/", "/").equals("01")).collect(Collectors.toList());
+        } else if (Integer.valueOf(id) == 5) {
+            filteredUsers = users.stream().filter(user -> user.getGender().equals("Male")).collect(Collectors.toList());
+        } else if (Integer.valueOf(id) == 6) {
+            filteredUsers = users.stream().filter(user -> Integer.valueOf(user.getAge()) >= 13 && (Integer.valueOf(user.getAge()) <= 19)).collect(Collectors.toList());
         }
         ArrayList<String> deviceTokens = new ArrayList<>();
         for (com.digital.marketing.entity.User user : filteredUsers) {
             deviceTokens.add(user.getToken());
         }
-//        String[] deviceTokens = new String[filteredUsers.size()];
-//        for (int i = 0; i < filteredUsers.size(); i++) {
-//            deviceTokens[i] = filteredUsers.get(i).getToken();
-//        }
+
         return deviceTokens;
     }
 
-    @RequestMapping(value= {"/segments/update/{id}"}, method=RequestMethod.GET)
+    @RequestMapping(value = {"/segments/update/{id}"}, method = RequestMethod.GET)
     public ModelAndView updateSegments(@PathVariable String id) {
         ArrayList<String> updatedDeviceTokens = getUpdatedDeviceTokens(id);
         Segment segment = segmentRepository.getSegmentById(Integer.valueOf(id));
@@ -272,7 +280,7 @@ public class AdminController {
         return model;
     }
 
-    @RequestMapping(value= {"/home/segments"}, method=RequestMethod.GET)
+    @RequestMapping(value = {"/home/segments"}, method = RequestMethod.GET)
     public ModelAndView segments() {
         ModelAndView model = new ModelAndView();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -283,7 +291,7 @@ public class AdminController {
         return model;
     }
 
-    @RequestMapping(value= {"/access_denied"}, method=RequestMethod.GET)
+    @RequestMapping(value = {"/access_denied"}, method = RequestMethod.GET)
     public ModelAndView accessDenied() {
         ModelAndView model = new ModelAndView();
         model.setViewName("errors/access_denied");
