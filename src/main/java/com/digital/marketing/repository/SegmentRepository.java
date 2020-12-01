@@ -2,29 +2,29 @@ package com.digital.marketing.repository;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
-import com.digital.marketing.entity.User;
+import com.digital.marketing.entity.Segment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public class UserRepository {
+public class SegmentRepository {
 
     @Autowired
     private DynamoDBMapper dynamoDBMapper;
 
-    public User save(User user) {
-        dynamoDBMapper.save(user);
-        return user;
+    public Segment save(Segment segment) {
+        dynamoDBMapper.save(segment);
+        return segment;
     }
 
-    public User getUserById(String userId) {
-        return dynamoDBMapper.load(User.class, userId);
+    public Segment getSegmentById(String id) {
+        return dynamoDBMapper.load(Segment.class, id);
     }
 
-    public List<User> getAllUsers() {
-        return dynamoDBMapper.scan(User.class, new DynamoDBScanExpression());
+    public List<Segment> getAllSegments() {
+        return dynamoDBMapper.scan(Segment.class, new DynamoDBScanExpression());
     }
 
 }

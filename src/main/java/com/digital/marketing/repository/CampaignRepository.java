@@ -2,6 +2,7 @@ package com.digital.marketing.repository;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
+import com.digital.marketing.entity.Campaign;
 import com.digital.marketing.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -9,22 +10,22 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public class UserRepository {
+public class CampaignRepository {
 
     @Autowired
     private DynamoDBMapper dynamoDBMapper;
 
-    public User save(User user) {
-        dynamoDBMapper.save(user);
-        return user;
+    public Campaign save(Campaign campaign) {
+        dynamoDBMapper.save(campaign);
+        return campaign;
     }
 
-    public User getUserById(String userId) {
-        return dynamoDBMapper.load(User.class, userId);
+    public Campaign getCampaignById(String id) {
+        return dynamoDBMapper.load(Campaign.class, id);
     }
 
-    public List<User> getAllUsers() {
-        return dynamoDBMapper.scan(User.class, new DynamoDBScanExpression());
+    public List<Campaign> getAllCampaigns() {
+        return dynamoDBMapper.scan(Campaign.class, new DynamoDBScanExpression());
     }
 
 }

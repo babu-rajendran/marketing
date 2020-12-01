@@ -10,16 +10,16 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@DynamoDBTable(tableName = "Segments")
-public class Segment {
+@DynamoDBTable(tableName = "Campaigns")
+public class Campaign {
 
-    @DynamoDBHashKey(attributeName = "segment_id")
+    @DynamoDBHashKey(attributeName = "campaign_id")
     private Integer id;
 
-    @DynamoDBAttribute(attributeName = "segment_name")
+    @DynamoDBAttribute(attributeName = "campaign_name")
     private String name;
 
-    @DynamoDBAttribute(attributeName = "segment_desc")
-    private String description;
+    @DynamoDBAttribute(attributeName = "campaign_content")
+    private String content;
 
 }
