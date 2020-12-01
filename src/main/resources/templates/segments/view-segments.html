@@ -17,16 +17,26 @@
 <h5>Manage Segments</h5>
 <div class="container">
     <h6>List of Segments</h6>
+
     <table border="1px">
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                <div class="alert alert-success" role="alert" th:if="${msg}" th:utext="${msg}">
+                </div>
+            </div>
+        </div>
         <tr>
             <th>Segment Id</th>
             <th>Segment Name</th>
             <th>Segment Description</th>
+            <th>Update Segment</th>
         </tr>
         <tr th:each="segment : ${segments}">
             <td th:text="${segment.id}"/>
             <td th:text="${segment.name}"/>
             <td th:text="${segment.description}"/>
+            <td> <a th:href="@{/segments/update/} + ${segment.id}" th:text="Update"/></td>
         </tr>
 
     </table>

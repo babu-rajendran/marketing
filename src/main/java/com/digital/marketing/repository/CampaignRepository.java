@@ -20,7 +20,7 @@ public class CampaignRepository {
         return campaign;
     }
 
-    public Campaign getCampaignById(String id) {
+    public Campaign getCampaignById(Integer id) {
         return dynamoDBMapper.load(Campaign.class, id);
     }
 

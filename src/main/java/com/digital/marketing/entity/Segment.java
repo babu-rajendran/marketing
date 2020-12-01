@@ -1,11 +1,15 @@
 package com.digital.marketing.entity;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDB;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
 
 @Data
 @AllArgsConstructor
@@ -22,4 +26,6 @@ public class Segment {
     @DynamoDBAttribute(attributeName = "segment_desc")
     private String description;
 
+    @DynamoDBAttribute(attributeName = "devices")
+    private ArrayList<String> devices;
 }

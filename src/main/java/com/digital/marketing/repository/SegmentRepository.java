@@ -19,7 +19,7 @@ public class SegmentRepository {
         return segment;
     }
 
-    public Segment getSegmentById(String id) {
+    public Segment getSegmentById(Integer id) {
         return dynamoDBMapper.load(Segment.class, id);
     }
 

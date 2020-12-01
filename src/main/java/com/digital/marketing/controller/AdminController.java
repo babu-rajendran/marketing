@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
@@ -24,6 +25,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -226,6 +228,44 @@ public class AdminController {
                 .sorted(Comparator.comparing(Segment::getId).reversed())
                 .collect(Collectors.toList());
 
+        model.addObject("segments", segments);
+        model.addObject("userName", user.getFirstname() + " " + user.getLastname());
+        model.setViewName("segments/view-segments");
+        return model;
+    }
+
+    private ArrayList<String> getUpdatedDeviceTokens(String id) {
+        List<com.digital.marketing.entity.User> users = userRepository.getAllUsers();
+        List<com.digital.marketing.entity.User> filteredUsers = null;
+        if (Integer.valueOf(id) == 1) {
+            filteredUsers = users.stream().filter(user -> Integer.valueOf(user.getAge()) > 18).collect(Collectors.toList());
+        }
+        ArrayList<String> deviceTokens = new ArrayList<>();
+        for (com.digital.marketing.entity.User user : filteredUsers) {
+            deviceTokens.add(user.getToken());
+        }
+//        String[] deviceTokens = new String[filteredUsers.size()];
+//        for (int i = 0; i < filteredUsers.size(); i++) {
+//            deviceTokens[i] = filteredUsers.get(i).getToken();
+//        }
+        return deviceTokens;
+    }
+
+    @RequestMapping(value= {"/segments/update/{id}"}, method=RequestMethod.GET)
+    public ModelAndView updateSegments(@PathVariable String id) {
+        ArrayList<String> updatedDeviceTokens = getUpdatedDeviceTokens(id);
+        Segment segment = segmentRepository.getSegmentById(Integer.valueOf(id));
+        segment.setDevices(updatedDeviceTokens);
+        segmentRepository.save(segment);
+        ModelAndView model = new ModelAndView();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = adminService.findUserByEmail(auth.getName());
+
+        List<Segment> segments = segmentRepository.getAllSegments().stream()
+                .sorted(Comparator.comparing(Segment::getId).reversed())
+                .collect(Collectors.toList());
+
+        model.addObject("msg", "Segment Updated Successfully!");
         model.addObject("segments", segments);
         model.addObject("userName", user.getFirstname() + " " + user.getLastname());
         model.setViewName("segments/view-segments");
